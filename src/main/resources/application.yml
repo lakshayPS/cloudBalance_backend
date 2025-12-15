@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: cloudBalance
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/CloudBalance
+    username: root
+    password: Lakshay@123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+jwt:
+  secret: MySuperSecretKeyThatIsAtLeast256BitsLong1234567890
+  expiration: 120000
+
