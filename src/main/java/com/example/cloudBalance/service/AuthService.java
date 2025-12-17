@@ -1,18 +1,23 @@
 package com.example.cloudBalance.service;
 
-import com.example.cloudBalance.dto.JwtResponse;
-import com.example.cloudBalance.dto.LoginRequest;
-import com.example.cloudBalance.dto.RegisterRequest;
+import com.example.cloudBalance.dto.*;
 import com.example.cloudBalance.entity.User;
+import com.example.cloudBalance.exception.ResourceNotFoundException;
 import com.example.cloudBalance.repository.UserRepository;
 import com.example.cloudBalance.utility.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class AuthService {
@@ -32,6 +37,25 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+//    public JwtResponse login(LoginRequest request) {
+//
+//        authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(
+//                        request.getEmail(),
+//                        request.getPassword()
+//                )
+//        );
+//
+//        UserDetails userDetails =
+//                userDetailsService.loadUserByUsername(request.getEmail());
+//
+//        String token = jwtUtil.generateToken(userDetails);
+//        System.out.println("authorities: " + userDetails.getAuthorities());
+//
+//        return new JwtResponse("Bearer", token);
+//    }
+
+
     public JwtResponse login(LoginRequest request) {
 
         authenticationManager.authenticate(
@@ -41,18 +65,25 @@ public class AuthService {
                 )
         );
 
-        UserDetails userDetails =
-                userDetailsService.loadUserByUsername(request.getEmail());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
 
         String token = jwtUtil.generateToken(userDetails);
 
-        return new JwtResponse("Bearer", token);
+        String role = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElse(null);
+
+        String userName = userDetails.getUsername();
+
+        return new JwtResponse("Bearer", token, role, userName);
     }
 
     public User register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("User already exists");
+            throw new ResourceNotFoundException("User already exists");
         }
 
         User user = new User();
@@ -63,5 +94,53 @@ public class AuthService {
         user.setLastName(request.getLastName());
 
         return userRepository.save(user);
+    }
+
+    public User updateUser(UpdateUserRequest request) {
+        String email = request.getEmail();
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+
+        if(!Objects.equals(user.getFirstName(), request.getFirstName())) {
+            user.setFirstName(request.getFirstName());
+        }
+
+        if(!Objects.equals(user.getLastName(), request.getLastName())) {
+            user.setLastName(request.getLastName());
+        }
+
+        if(!Objects.equals(user.getRole(), request.getRole())) {
+            user.setRole(request.getRole());
+        }
+
+        return userRepository.save(user);
+//        UserResponse userResponse = new UserResponse();
+//        userResponse.setFirstName(newUser.getFirstName());
+//        userResponse.setLastName(newUser.getLastName());
+//        userResponse.setEmail(newUser.getEmail());
+//        userResponse.setRole(newUser.getRole());
+//
+//        return userResponse;
+    }
+
+    public List<UserResponse> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return mapToUserResponseDto(users);
+    }
+
+    private List<UserResponse> mapToUserResponseDto(List<User> users) {
+        List<UserResponse> result = new ArrayList<>();
+
+        for(User user: users) {
+            UserResponse userResponse = new UserResponse();
+            userResponse.setFirstName(user.getFirstName());
+            userResponse.setLastName(user.getLastName());
+            userResponse.setEmail(user.getEmail());
+            userResponse.setRole(user.getRole());
+
+            result.add(userResponse);
+        }
+
+        return result;
     }
 }
