@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,25 +35,6 @@ public class AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-//    public JwtResponse login(LoginRequest request) {
-//
-//        authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(
-//                        request.getEmail(),
-//                        request.getPassword()
-//                )
-//        );
-//
-//        UserDetails userDetails =
-//                userDetailsService.loadUserByUsername(request.getEmail());
-//
-//        String token = jwtUtil.generateToken(userDetails);
-//        System.out.println("authorities: " + userDetails.getAuthorities());
-//
-//        return new JwtResponse("Bearer", token);
-//    }
-
 
     public JwtResponse login(LoginRequest request) {
 
@@ -114,13 +94,6 @@ public class AuthService {
         }
 
         return userRepository.save(user);
-//        UserResponse userResponse = new UserResponse();
-//        userResponse.setFirstName(newUser.getFirstName());
-//        userResponse.setLastName(newUser.getLastName());
-//        userResponse.setEmail(newUser.getEmail());
-//        userResponse.setRole(newUser.getRole());
-//
-//        return userResponse;
     }
 
     public List<UserResponse> getAllUsers() {
@@ -140,7 +113,6 @@ public class AuthService {
 
             result.add(userResponse);
         }
-
         return result;
     }
 }
