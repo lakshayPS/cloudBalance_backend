@@ -1,39 +1,3 @@
-//package com.example.cloudBalance.controller;
-//
-//import com.example.cloudBalance.dto.OnboardedAcRequest;
-//import com.example.cloudBalance.dto.OnboardedAcResponse;
-//import com.example.cloudBalance.service.AccountService;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.List;
-//
-//@RestController
-//@RequestMapping("/api/accounts")
-//@RequiredArgsConstructor
-//public class AccountController {
-//
-//    private final AccountService accountService;
-//
-//    @PostMapping("/create")
-//    public ResponseEntity<OnboardedAcRequest> createAccount(
-//            @RequestBody OnboardedAcRequest dto
-//    ) {
-//        return new ResponseEntity<>(
-//                accountService.createAccount(dto),
-//                HttpStatus.CREATED
-//        );
-//    }
-//
-//    @GetMapping("/getAllAccounts")
-//    public ResponseEntity<List<OnboardedAcResponse>> getAllOnboardedAccounts() {
-//        return new ResponseEntity<>(accountService.getAllOnboardedAccounts(), HttpStatus.OK);
-//    }
-//}
-
-
 package com.example.cloudBalance.controller;
 
 import com.example.cloudBalance.dto.AssignAccountsRequest;
@@ -48,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/accounts")
 @RequiredArgsConstructor

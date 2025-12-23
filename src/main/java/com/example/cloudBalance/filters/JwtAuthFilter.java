@@ -42,7 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 token = authHeader.substring(7);
                 username = jwtUtil.extractUsername(token);
             }
-            System.out.println("inside try!!!!!!!!!!!");
+//            System.out.println("inside try!!!!!!!!!!!");
         } catch (Exception e) {
             return;
         }
@@ -67,7 +67,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-        System.out.println("after filter");
+//        System.out.println("after filter");
     }
 
     @Override

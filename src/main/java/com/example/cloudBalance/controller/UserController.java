@@ -1,6 +1,5 @@
 package com.example.cloudBalance.controller;
 
-
 import com.example.cloudBalance.dto.UpdateUserRequest;
 import com.example.cloudBalance.dto.UserResponse;
 import com.example.cloudBalance.entity.User;
@@ -21,7 +20,6 @@ public class UserController {
 
     @GetMapping("/getAllUsers")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
-        System.out.println("giving users data!!!!!!!!");
         return ResponseEntity.ok(authService.getAllUsers());
     }
 
