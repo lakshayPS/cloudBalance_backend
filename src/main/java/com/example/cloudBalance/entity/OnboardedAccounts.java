@@ -6,7 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -32,7 +33,7 @@ public class OnboardedAccounts {
             joinColumns = @JoinColumn(name = "account_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> assignedToAccounts = new ArrayList<>();;
+    private Set<User> assignedToAccounts = new HashSet<>();;
 }
 
 
