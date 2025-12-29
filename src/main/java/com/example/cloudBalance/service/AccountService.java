@@ -5,6 +5,7 @@ import com.example.cloudBalance.dto.OnboardedAcResponse;
 import com.example.cloudBalance.entity.OnboardedAccounts;
 import com.example.cloudBalance.entity.User;
 import com.example.cloudBalance.enums.AccountStatus;
+import com.example.cloudBalance.exception.ResourceNotFoundException;
 import com.example.cloudBalance.repository.OnboardedAccountRepository;
 import com.example.cloudBalance.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -107,7 +108,7 @@ public class AccountService {
     }
 
     @Transactional
-    public void assignAccountsToUser(Long userId, List<Long> accIds) {
+    public void assignAccountToUser(Long userId, List<Long> accIds) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -115,7 +116,7 @@ public class AccountService {
         List<OnboardedAccounts> accounts = accountRepository.findAllById(accIds);
 
         if (accounts.size() != accIds.size()) {
-            throw new IllegalArgumentException("One or more accounts not found");
+            throw new ResourceNotFoundException("Some accounts not found");
         }
 
         for (OnboardedAccounts account : accounts) {
@@ -129,6 +130,7 @@ public class AccountService {
 
         accountRepository.saveAll(accounts);
     }
+
 
     @Transactional
     public List<OnboardedAcResponse> getAccountsByUserId(Long userId) {

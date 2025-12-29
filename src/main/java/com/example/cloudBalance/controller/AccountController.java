@@ -40,7 +40,7 @@ public class AccountController {
             @PathVariable Long userId,
             @RequestBody AssignAccountsRequest request
     ) {
-        accountService.assignAccountsToUser(userId, request.getAccIds());
+        accountService.assignAccountToUser(userId, request.getAccIds());
         return ResponseEntity.ok("Accounts assigned to user successfully");
     }
 
