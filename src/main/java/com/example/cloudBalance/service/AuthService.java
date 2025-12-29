@@ -106,6 +106,7 @@ public class AuthService {
 
         for(User user: users) {
             UserResponse userResponse = new UserResponse();
+            userResponse.setId(user.getId());
             userResponse.setFirstName(user.getFirstName());
             userResponse.setLastName(user.getLastName());
             userResponse.setEmail(user.getEmail());

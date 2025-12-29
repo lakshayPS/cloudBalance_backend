@@ -25,19 +25,16 @@ public class AccountService {
     @Transactional
     public OnboardedAcResponse createAccount(OnboardedAcRequest dto) {
 
-        // 1️⃣ Validate accId uniqueness
         if (accountRepository.existsById(dto.getAccId())) {
             throw new IllegalStateException(
                     "Account with ID " + dto.getAccId() + " already exists"
             );
         }
 
-        // 2️⃣ Validate IAM ARN uniqueness
         if (accountRepository.existsByIamARN(dto.getIamARN())) {
             throw new IllegalStateException("Account already onboarded with this IAM ARN");
         }
 
-        // 3️⃣ Map DTO → Entity
         OnboardedAccounts account = new OnboardedAccounts();
         account.setAccId(dto.getAccId());
         account.setAccName(dto.getAccName());
@@ -46,7 +43,6 @@ public class AccountService {
                 dto.getAccStatus() != null ? dto.getAccStatus() : AccountStatus.ORPHANED
         );
 
-        // 4️⃣ Assign users (if provided)
         if (dto.getUserEmails() != null && !dto.getUserEmails().isEmpty()) {
 
             List<User> users = userRepository.findByEmailIn(dto.getUserEmails());
@@ -76,7 +72,6 @@ public class AccountService {
 
         return response;
     }
-
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")

@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class RegisterRequest {
 
@@ -19,4 +21,5 @@ public class RegisterRequest {
     private String lastName;
     private Role role;
 
+    private List<Long> accountIds;
 }
