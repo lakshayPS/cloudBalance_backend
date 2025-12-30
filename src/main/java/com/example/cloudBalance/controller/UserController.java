@@ -6,12 +6,16 @@ import com.example.cloudBalance.dto.UserResponse;
 import com.example.cloudBalance.entity.User;
 import com.example.cloudBalance.service.AuthService;
 import com.example.cloudBalance.service.UserService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Validated
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/users")
@@ -29,17 +33,17 @@ public class UserController {
     }
 
     @PutMapping("/updateUser")
-    public ResponseEntity<User> update(@RequestBody UpdateUserRequest request) {
+    public ResponseEntity<User> update(@Valid @RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(authService.updateUser(request));
     }
 
     @PostMapping("/addUser")
-    public ResponseEntity<User> addUser(@RequestBody RegisterRequest request) {
+    public ResponseEntity<User> addUser(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(userService.registerAndAssignAccounts(request));
     }
 
     @PostMapping("/editUser/{userId}")
-    public ResponseEntity<User> editUser(@PathVariable Long userId, @RequestBody UpdateUserRequest request) {
+    public ResponseEntity<User> editUser(@Positive(message = "User ID must be a positive number") @PathVariable Long userId, @Valid @RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(userService.editUser(userId, request));
     }
 }

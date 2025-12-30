@@ -44,6 +44,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
 //            System.out.println("inside try!!!!!!!!!!!");
         } catch (Exception e) {
+            filterChain.doFilter(request, response);
             return;
         }
 
@@ -70,9 +71,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 //        System.out.println("after filter");
     }
 
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getMethod().equals("OPTIONS");
+        String path = request.getServletPath();
+        return path.startsWith("/auth/") || request.getMethod().equals("OPTIONS");
     }
+
 
 }

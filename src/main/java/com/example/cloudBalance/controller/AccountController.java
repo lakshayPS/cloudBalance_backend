@@ -5,9 +5,11 @@ import com.example.cloudBalance.dto.OnboardedAcRequest;
 import com.example.cloudBalance.dto.OnboardedAcResponse;
 import com.example.cloudBalance.service.AccountService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/accounts")
 @RequiredArgsConstructor
+@Validated
 public class AccountController {
 
     private final AccountService accountService;
@@ -37,15 +40,18 @@ public class AccountController {
 
     @PostMapping("/users/{userId}/assign-accounts")
     public ResponseEntity<String> assignAccountsToUser(
+            @Positive(message = "User ID must be a positive number")
             @PathVariable Long userId,
-            @RequestBody AssignAccountsRequest request
+            @Valid @RequestBody AssignAccountsRequest request
     ) {
         accountService.assignAccountToUser(userId, request.getAccIds());
         return ResponseEntity.ok("Accounts assigned to user successfully");
     }
 
     @GetMapping("/users/{userId}/accounts")
-    public ResponseEntity<List<OnboardedAcResponse>> getAccountsByUser (@PathVariable Long userId) {
+    public ResponseEntity<List<OnboardedAcResponse>> getAccountsByUser (
+            @Positive(message = "User ID must be a positive number")
+            @PathVariable Long userId) {
         return ResponseEntity.ok(accountService.getAccountsByUserId(userId));
     }
 

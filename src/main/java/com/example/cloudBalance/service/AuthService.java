@@ -2,6 +2,7 @@ package com.example.cloudBalance.service;
 
 import com.example.cloudBalance.dto.*;
 import com.example.cloudBalance.entity.User;
+import com.example.cloudBalance.exception.ResourceAlreadyExistsException;
 import com.example.cloudBalance.exception.ResourceNotFoundException;
 import com.example.cloudBalance.repository.UserRepository;
 import com.example.cloudBalance.utility.JwtUtil;
@@ -37,6 +38,7 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
     public JwtResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -63,7 +65,7 @@ public class AuthService {
     public User register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new ResourceNotFoundException("User already exists");
+            throw new ResourceAlreadyExistsException("User already exists");
         }
 
         User user = new User();
