@@ -24,9 +24,4 @@ public class OnboardedAcRequest {
 
     @NotNull(message = "Account status must be provided")
     private AccountStatus accStatus = AccountStatus.ORPHANED;
-
-    private List<
-            @Email(message = "Invalid user email format")
-                    String
-            > userEmails;
 }

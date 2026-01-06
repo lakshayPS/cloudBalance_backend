@@ -5,6 +5,7 @@ import com.example.cloudBalance.dto.OnboardedAcResponse;
 import com.example.cloudBalance.entity.OnboardedAccounts;
 import com.example.cloudBalance.entity.User;
 import com.example.cloudBalance.enums.AccountStatus;
+import com.example.cloudBalance.exception.ResourceAlreadyExistsException;
 import com.example.cloudBalance.exception.ResourceNotFoundException;
 import com.example.cloudBalance.repository.OnboardedAccountRepository;
 import com.example.cloudBalance.repository.UserRepository;
@@ -22,55 +23,78 @@ public class AccountService {
     private final OnboardedAccountRepository accountRepository;
     private final UserRepository userRepository;
 
+//    @Transactional
+//    public OnboardedAcResponse createAccount(OnboardedAcRequest dto) {
+//
+//        if (accountRepository.existsById(dto.getAccId())) {
+//            throw new IllegalStateException(
+//                    "Account with ID " + dto.getAccId() + " already exists"
+//            );
+//        }
+//
+//        if (accountRepository.existsByIamARN(dto.getIamARN())) {
+//            throw new IllegalStateException("Account already onboarded with this IAM ARN");
+//        }
+//
+//        OnboardedAccounts account = new OnboardedAccounts();
+//        account.setAccId(dto.getAccId());
+//        account.setAccName(dto.getAccName());
+//        account.setIamARN(dto.getIamARN());
+//        account.setAccStatus(
+//                dto.getAccStatus() != null ? dto.getAccStatus() : AccountStatus.ORPHANED
+//        );
+//
+//        if (dto.getUserEmails() != null && !dto.getUserEmails().isEmpty()) {
+//
+//            List<User> users = userRepository.findByEmailIn(dto.getUserEmails());
+//
+//            if (users.size() != dto.getUserEmails().size()) {
+//                throw new IllegalArgumentException("One or more user emails are invalid");
+//            }
+//
+//            account.setAssignedToAccounts(users);
+//        }
+//
+//        OnboardedAccounts saved = accountRepository.save(account);
+//
+//        OnboardedAcResponse response = new OnboardedAcResponse();
+//        response.setAccId(saved.getAccId());
+//        response.setAccName(saved.getAccName());
+//        response.setIamARN(saved.getIamARN());
+//        response.setAccStatus(saved.getAccStatus());
+//        response.setUserEmails(
+//                saved.getAssignedToAccounts() == null
+//                        ? List.of()
+//                        : saved.getAssignedToAccounts()
+//                        .stream()
+//                        .map(User::getEmail)
+//                        .toList()
+//        );
+//
+//        return response;
+//    }
+
     @Transactional
     public OnboardedAcResponse createAccount(OnboardedAcRequest dto) {
 
         if (accountRepository.existsById(dto.getAccId())) {
-            throw new IllegalStateException(
-                    "Account with ID " + dto.getAccId() + " already exists"
-            );
+            throw new ResourceAlreadyExistsException("Account already exists");
         }
 
         if (accountRepository.existsByIamARN(dto.getIamARN())) {
-            throw new IllegalStateException("Account already onboarded with this IAM ARN");
+            throw new ResourceAlreadyExistsException("Account already onboarded");
         }
 
         OnboardedAccounts account = new OnboardedAccounts();
         account.setAccId(dto.getAccId());
         account.setAccName(dto.getAccName());
         account.setIamARN(dto.getIamARN());
-        account.setAccStatus(
-                dto.getAccStatus() != null ? dto.getAccStatus() : AccountStatus.ORPHANED
-        );
 
-        if (dto.getUserEmails() != null && !dto.getUserEmails().isEmpty()) {
-
-            List<User> users = userRepository.findByEmailIn(dto.getUserEmails());
-
-            if (users.size() != dto.getUserEmails().size()) {
-                throw new IllegalArgumentException("One or more user emails are invalid");
-            }
-
-            account.setAssignedToAccounts(users);
-        }
+        account.setAccStatus(AccountStatus.ORPHANED);
 
         OnboardedAccounts saved = accountRepository.save(account);
 
-        OnboardedAcResponse response = new OnboardedAcResponse();
-        response.setAccId(saved.getAccId());
-        response.setAccName(saved.getAccName());
-        response.setIamARN(saved.getIamARN());
-        response.setAccStatus(saved.getAccStatus());
-        response.setUserEmails(
-                saved.getAssignedToAccounts() == null
-                        ? List.of()
-                        : saved.getAssignedToAccounts()
-                        .stream()
-                        .map(User::getEmail)
-                        .toList()
-        );
-
-        return response;
+        return mapToResponse(saved);
     }
 
     @Transactional(readOnly = true)
