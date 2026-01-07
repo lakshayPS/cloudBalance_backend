@@ -49,17 +49,17 @@ public class AuthService {
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
 
+        String token = jwtUtil.generateToken(userDetails);
         String userName = user.getFirstName() + " " + user.getLastName();
-        String token = jwtUtil.generateToken(userDetails,userName);
+        String email = userDetails.getUsername();
 
-//        String role = userDetails.getAuthorities()
-//                .stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .findFirst()
-//                .orElse(null);
+        String role = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElse(null);
 
-
-        return new JwtResponse("Bearer", token);
+        return new JwtResponse("Bearer", token, userName, email, role);
     }
 
     public User register(RegisterRequest request) {

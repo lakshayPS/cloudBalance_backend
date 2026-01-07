@@ -26,7 +26,7 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public String generateToken(UserDetails userDetails, String userName) {
+    public String generateToken(UserDetails userDetails) {
 
         List<String> roles = userDetails.getAuthorities()
             .stream()
@@ -35,7 +35,6 @@ public class JwtUtil {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", roles);
-        claims.put("username", userName);
 
         return Jwts.builder()
             .setSubject(userDetails.getUsername())
