@@ -2,6 +2,7 @@ package com.example.cloudBalance.service;
 
 import com.example.cloudBalance.dto.RegisterRequest;
 import com.example.cloudBalance.dto.UpdateUserRequest;
+import com.example.cloudBalance.dto.UserResponse;
 import com.example.cloudBalance.entity.OnboardedAccounts;
 import com.example.cloudBalance.entity.User;
 import com.example.cloudBalance.enums.AccountStatus;
@@ -29,7 +30,7 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     @Transactional
-    public User registerAndAssignAccounts(RegisterRequest request) {
+    public UserResponse registerAndAssignAccounts(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("User already exists");
@@ -62,11 +63,11 @@ public class UserService {
             accountRepository.saveAll(accounts);
         }
 
-        return savedUser;
+        return mapToUserResponseDto(savedUser);
     }
 
     @Transactional
-    public User editUser(Long userId, UpdateUserRequest request) {
+    public UserResponse editUser(Long userId, UpdateUserRequest request) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -89,7 +90,7 @@ public class UserService {
         if (request.getRole() != Role.ROLE_CUSTOMER) {
             unassignUserFromAccounts(user, currentlyAssignedAccounts);
             accountRepository.saveAll(currentlyAssignedAccounts);
-            return user;
+            return mapToUserResponseDto(user);
         }
 
         List<Long> requestedAccountIds =
@@ -115,7 +116,7 @@ public class UserService {
         accountRepository.saveAll(currentlyAssignedAccounts);
         accountRepository.saveAll(requestedAccounts);
 
-        return user;
+        return mapToUserResponseDto(user);
     }
 
     private void unassignUserFromAccounts(User user, List<OnboardedAccounts> accounts) {
@@ -137,6 +138,17 @@ public class UserService {
             account.getAssignedToAccounts().add(user);
             account.setAccStatus(AccountStatus.ASSIGNED);
         }
+    }
+
+    private UserResponse mapToUserResponseDto(User user) {
+        UserResponse dto = new UserResponse();
+        dto.setId(user.getId());
+        dto.setEmail(user.getEmail());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setRole(user.getRole());
+
+        return dto;
     }
 }
 

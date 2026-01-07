@@ -32,18 +32,13 @@ public class UserController {
         return ResponseEntity.ok(authService.getAllUsers());
     }
 
-    @PutMapping("/updateUser")
-    public ResponseEntity<User> update(@Valid @RequestBody UpdateUserRequest request) {
-        return ResponseEntity.ok(authService.updateUser(request));
-    }
-
     @PostMapping("/addUser")
-    public ResponseEntity<User> addUser(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<UserResponse> addUser(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(userService.registerAndAssignAccounts(request));
     }
 
     @PostMapping("/editUser/{userId}")
-    public ResponseEntity<User> editUser(@Positive(message = "User ID must be a positive number") @PathVariable Long userId, @Valid @RequestBody UpdateUserRequest request) {
+    public ResponseEntity<UserResponse> editUser(@Valid @Positive(message = "User ID must be a positive number") @PathVariable Long userId, @Valid @RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(userService.editUser(userId, request));
     }
 }

@@ -10,6 +10,4 @@ import lombok.NoArgsConstructor;
 public class JwtResponse {
     private String tokenType;
     private String token;
-    private String role;
-    private String userName;
 }
