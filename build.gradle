@@ -41,15 +41,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
 }
 
-sonarqube {
-    properties {
-        property("sonar.projectKey", "springboot-app")
-        property("sonar.projectName", "Spring Boot App")
-        property("sonar.host.url", "http://localhost:9000")
-        property("sonar.login", "YOUR_SONAR_TOKEN")
-    }
-}
-
 tasks.named('test') {
     useJUnitPlatform()
 }
