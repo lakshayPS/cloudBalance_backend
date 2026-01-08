@@ -12,6 +12,7 @@ public interface OnboardedAccountRepository extends JpaRepository<OnboardedAccou
 
     boolean existsByIamARN(String iamARN);
     List<OnboardedAccounts> findByAssignedToAccounts_Id(Long userId);
+    List<OnboardedAccounts> findByAssignedToAccounts_Email(String email);
 // Optional: fetch account with assigned users
     // @EntityGraph(attributePaths = "assignedToAccounts")
     // Optional<OnboardedAccounts> findByAccId(Long accId);

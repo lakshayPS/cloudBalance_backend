@@ -5,6 +5,7 @@ import com.example.cloudBalance.dto.OnboardedAcRequest;
 import com.example.cloudBalance.dto.OnboardedAcResponse;
 import com.example.cloudBalance.service.AccountService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -49,10 +50,18 @@ public class AccountController {
     }
 
     @GetMapping("/users/{userId}/accounts")
-    public ResponseEntity<List<OnboardedAcResponse>> getAccountsByUser (
+    public ResponseEntity<List<OnboardedAcResponse>> getAccountsByUserID(
             @Positive(message = "User ID must be a positive number")
             @PathVariable Long userId) {
         return ResponseEntity.ok(accountService.getAccountsByUserId(userId));
     }
 
+    @GetMapping("/getByEmail")
+    public ResponseEntity<List<OnboardedAcResponse>> getAccountsByUserEmail(
+            @RequestParam String email) {
+
+        return ResponseEntity.ok(
+                accountService.getAccountsByUserEmail(email)
+        );
+    }
 }

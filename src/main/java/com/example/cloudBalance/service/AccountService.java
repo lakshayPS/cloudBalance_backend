@@ -162,4 +162,22 @@ public class AccountService {
 
         return accounts.stream().map(this :: mapToResponse).toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<OnboardedAcResponse> getAccountsByUserEmail(String email) {
+
+        List<OnboardedAccounts> accounts =
+                accountRepository.findByAssignedToAccounts_Email(email);
+
+        if (accounts.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "No accounts assigned to user with email: " + email
+            );
+        }
+
+        return accounts.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
 }
