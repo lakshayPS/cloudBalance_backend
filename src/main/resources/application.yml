@@ -14,5 +14,5 @@ spring:
 
 jwt:
   secret: MySuperSecretKeyThatIsAtLeast256BitsLong1234567890
-  expiration: 1200000
+  expiration: 300000
 
