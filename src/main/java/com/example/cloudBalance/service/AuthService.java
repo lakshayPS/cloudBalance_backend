@@ -7,6 +7,7 @@ import com.example.cloudBalance.exception.ResourceNotFoundException;
 import com.example.cloudBalance.repository.UserRepository;
 import com.example.cloudBalance.utility.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -98,6 +99,7 @@ public class AuthService {
         return userRepository.save(user);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'READONLY')")
     public List<UserResponse> getAllUsers() {
         List<User> users = userRepository.findAll();
         return mapToUserResponseDto(users);

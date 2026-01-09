@@ -11,6 +11,7 @@ import com.example.cloudBalance.exception.ResourceNotFoundException;
 import com.example.cloudBalance.repository.OnboardedAccountRepository;
 import com.example.cloudBalance.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse registerAndAssignAccounts(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -67,6 +69,7 @@ public class UserService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse editUser(Long userId, UpdateUserRequest request) {
 
         User user = userRepository.findById(userId)

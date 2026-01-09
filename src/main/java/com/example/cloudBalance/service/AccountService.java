@@ -23,58 +23,8 @@ public class AccountService {
     private final OnboardedAccountRepository accountRepository;
     private final UserRepository userRepository;
 
-//    @Transactional
-//    public OnboardedAcResponse createAccount(OnboardedAcRequest dto) {
-//
-//        if (accountRepository.existsById(dto.getAccId())) {
-//            throw new IllegalStateException(
-//                    "Account with ID " + dto.getAccId() + " already exists"
-//            );
-//        }
-//
-//        if (accountRepository.existsByIamARN(dto.getIamARN())) {
-//            throw new IllegalStateException("Account already onboarded with this IAM ARN");
-//        }
-//
-//        OnboardedAccounts account = new OnboardedAccounts();
-//        account.setAccId(dto.getAccId());
-//        account.setAccName(dto.getAccName());
-//        account.setIamARN(dto.getIamARN());
-//        account.setAccStatus(
-//                dto.getAccStatus() != null ? dto.getAccStatus() : AccountStatus.ORPHANED
-//        );
-//
-//        if (dto.getUserEmails() != null && !dto.getUserEmails().isEmpty()) {
-//
-//            List<User> users = userRepository.findByEmailIn(dto.getUserEmails());
-//
-//            if (users.size() != dto.getUserEmails().size()) {
-//                throw new IllegalArgumentException("One or more user emails are invalid");
-//            }
-//
-//            account.setAssignedToAccounts(users);
-//        }
-//
-//        OnboardedAccounts saved = accountRepository.save(account);
-//
-//        OnboardedAcResponse response = new OnboardedAcResponse();
-//        response.setAccId(saved.getAccId());
-//        response.setAccName(saved.getAccName());
-//        response.setIamARN(saved.getIamARN());
-//        response.setAccStatus(saved.getAccStatus());
-//        response.setUserEmails(
-//                saved.getAssignedToAccounts() == null
-//                        ? List.of()
-//                        : saved.getAssignedToAccounts()
-//                        .stream()
-//                        .map(User::getEmail)
-//                        .toList()
-//        );
-//
-//        return response;
-//    }
-
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public OnboardedAcResponse createAccount(OnboardedAcRequest dto) {
 
         if (accountRepository.existsById(dto.getAccId())) {
@@ -98,14 +48,13 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'READONLY')")
     public List<OnboardedAcResponse> getAllOnboardedAccounts() {
         return accountRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
     }
-
 
     private OnboardedAcResponse mapToResponse(OnboardedAccounts ac) {
         OnboardedAcResponse dto = new OnboardedAcResponse();
@@ -127,6 +76,7 @@ public class AccountService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public void assignAccountToUser(Long userId, List<Long> accIds) {
 
         User user = userRepository.findById(userId)
@@ -152,6 +102,7 @@ public class AccountService {
 
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public List<OnboardedAcResponse> getAccountsByUserId(Long userId) {
 
         if(!userRepository.existsById(userId)) {
@@ -164,6 +115,7 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('CUSTOMER')")
     public List<OnboardedAcResponse> getAccountsByUserEmail(String email) {
 
         List<OnboardedAccounts> accounts =
