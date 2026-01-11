@@ -6,13 +6,20 @@ spring:
     username: root
     password: Lakshay@123
     driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
 
 jwt:
   secret: MySuperSecretKeyThatIsAtLeast256BitsLong1234567890
   expiration: 300000
 
+snowflake:
+  url: "jdbc:snowflake://WCQGUXC-JI40561.snowflakecomputing.com/?db=AWS_COST_DB&schema=PUBLIC&warehouse=COST_WAREHOUSE&role=ACCOUNTADMIN&jdbc_query_result_format=JSON"
+  username: "LAKSHAYPS"
+  password: "181580Lakshay181580@$#"
+  driver-class-name: "net.snowflake.client.jdbc.SnowflakeDriver"

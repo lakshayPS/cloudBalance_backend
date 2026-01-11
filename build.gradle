@@ -29,6 +29,10 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    implementation('com.snowflake:snowpark_2.12:1.18.0') {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
+
     runtimeOnly 'mysql:mysql-connector-java:8.0.30'
 
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
@@ -38,7 +42,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
