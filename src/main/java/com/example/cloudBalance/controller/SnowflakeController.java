@@ -1,15 +1,13 @@
 package com.example.cloudBalance.controller;
 
 import com.example.cloudBalance.service.SnowflakeService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/snowflake")
 public class SnowflakeController {
@@ -20,14 +18,12 @@ public class SnowflakeController {
         this.snowflakeService = snowflakeService;
     }
 
-    /* ---------------- RAW TABLE ---------------- */
 
     @GetMapping("/costs")
     public List<Map<String, Object>> getAllCosts() {
         return snowflakeService.getAllCosts();
     }
 
-    /* ---------------- GROUP BY ---------------- */
 
     @GetMapping("/charts/cost-per-service")
     public List<Map<String, Object>> getCostPerService() {
@@ -48,6 +44,24 @@ public class SnowflakeController {
     public List<Map<String, Object>> getCostPerAccount() {
         return snowflakeService.getCostPerAccount();
     }
+
+//    @GetMapping("/charts/monthly-cost-by-group")
+//    public List<Map<String, Object>> getMonthlyCostByGroup(@RequestParam(defaultValue = "SERVICE") String groupBy) {
+//        return snowflakeService.getMonthlyCostByField(groupBy);
+//    }
+@GetMapping("/monthly-cost-by-group")
+public List<Map<String, Object>> getMonthlyCost(
+        @RequestParam String groupBy,
+        @RequestParam int fromYear,
+        @RequestParam int fromMonth,
+        @RequestParam int toYear,
+        @RequestParam int toMonth
+) {
+    return snowflakeService.getMonthlyCostByField(
+            groupBy, fromYear, fromMonth, toYear, toMonth
+    );
+}
+
 
     /* ---------------- TIME SERIES ---------------- */
 
