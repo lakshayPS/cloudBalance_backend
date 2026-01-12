@@ -19,7 +19,12 @@ jwt:
   expiration: 300000
 
 snowflake:
-  url: "jdbc:snowflake://WCQGUXC-JI40561.snowflakecomputing.com/?db=AWS_COST_DB&schema=PUBLIC&warehouse=COST_WAREHOUSE&role=ACCOUNTADMIN&jdbc_query_result_format=JSON"
-  username: "LAKSHAYPS"
-  password: "181580Lakshay181580@$#"
-  driver-class-name: "net.snowflake.client.jdbc.SnowflakeDriver"
+  url : https://wcqguxc-ji40561.snowflakecomputing.com
+  account : "WCQGUXC-JI40561"
+  username : "LAKSHAYPS"
+  authenticator : "externalbrowser"
+  role : "ACCOUNTADMIN"
+  warehouse : "COMPUTE_WH"
+  database : "COST_EXPLORER"
+  schema : "PUBLIC"
+  password : "181580Lakshay181580@$#"

@@ -4,7 +4,7 @@ import com.example.cloudBalance.dto.*;
 import com.example.cloudBalance.entity.User;
 import com.example.cloudBalance.exception.ResourceAlreadyExistsException;
 import com.example.cloudBalance.exception.ResourceNotFoundException;
-import com.example.cloudBalance.repository.UserRepository;
+import com.example.cloudBalance.repository.mysql.UserRepository;
 import com.example.cloudBalance.utility.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,6 +1,6 @@
 package com.example.cloudBalance.service;
 
-import com.example.cloudBalance.repository.SnowflakeRepository;
+import com.example.cloudBalance.repository.snowflake.SnowflakeRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,34 +15,87 @@ public class SnowflakeService {
         this.repository = repository;
     }
 
-    public List<Map<String, Object>> getEc2Data() {
-        return repository.getAll("EC2_SERVICES");
+    /* ---------------- RAW TABLE ---------------- */
+
+    public List<Map<String, Object>> getAllCosts() {
+        return repository.fetchAll("COST_EXPLORER.PUBLIC.COSTS");
     }
 
-    public List<Map<String, Object>> getRdsData() {
-        return repository.getAll("RDS_SERVICES");
-    }
-
-    public List<Map<String, Object>> getAsgData() {
-        return repository.getAll("ASG_SERVICES");
-    }
-
-    public List<Map<String, Object>> getCostsData() {
-        return repository.getAll("AWS_COSTS");
-    }
+    /* ---------------- GROUP BY ---------------- */
 
     public List<Map<String, Object>> getCostPerService() {
-        String sql = "SELECT SERVICE, SUM(COST) AS TOTAL_COST FROM AWS_COSTS GROUP BY SERVICE ORDER BY TOTAL_COST DESC";
-        return repository.queryForList(sql);
+        return repository.fetchQuery(
+                "SELECT SERVICE, SUM(COST) AS TOTAL_COST " +
+                        "FROM COST_EXPLORER.PUBLIC.COSTS " +
+                        "GROUP BY SERVICE " +
+                        "ORDER BY TOTAL_COST DESC"
+        );
     }
 
     public List<Map<String, Object>> getCostPerRegion() {
-        String sql = "SELECT REGION, SUM(COST) AS TOTAL_COST FROM AWS_COSTS GROUP BY REGION ORDER BY TOTAL_COST DESC";
-        return repository.queryForList(sql);
+        return repository.fetchQuery(
+                "SELECT REGION, SUM(COST) AS TOTAL_COST " +
+                        "FROM COST_EXPLORER.PUBLIC.COSTS " +
+                        "GROUP BY REGION " +
+                        "ORDER BY TOTAL_COST DESC"
+        );
     }
 
+    public List<Map<String, Object>> getCostPerInstanceType() {
+        return repository.fetchQuery(
+                "SELECT INSTANCE_TYPE, SUM(COST) AS TOTAL_COST " +
+                        "FROM COST_EXPLORER.PUBLIC.COSTS " +
+                        "GROUP BY INSTANCE_TYPE " +
+                        "ORDER BY TOTAL_COST DESC"
+        );
+    }
+
+    public List<Map<String, Object>> getCostPerAccount() {
+        return repository.fetchQuery(
+                "SELECT ACCOUNT_ID, SUM(COST) AS TOTAL_COST " +
+                        "FROM COST_EXPLORER.PUBLIC.COSTS " +
+                        "GROUP BY ACCOUNT_ID " +
+                        "ORDER BY TOTAL_COST DESC"
+        );
+    }
+
+    /* ---------------- TIME SERIES ---------------- */
+
     public List<Map<String, Object>> getMonthlyCost() {
-        String sql = "SELECT TO_CHAR(USAGE_DATE, 'YYYY-MM') AS MONTH, SUM(COST) AS TOTAL_COST FROM AWS_COSTS GROUP BY MONTH ORDER BY MONTH ASC";
-        return repository.queryForList(sql);
+        return repository.fetchQuery(
+                "SELECT TO_CHAR(BILL_DATE,'YYYY-MM') AS MONTH, " +
+                        "SUM(COST) AS TOTAL_COST " +
+                        "FROM COST_EXPLORER.PUBLIC.COSTS " +
+                        "GROUP BY MONTH " +
+                        "ORDER BY MONTH"
+        );
+    }
+
+    public List<Map<String, Object>> getMonthlyCostByService() {
+        return repository.fetchQuery(
+                "SELECT TO_CHAR(BILL_DATE,'YYYY-MM') AS MONTH, SERVICE, " +
+                        "SUM(COST) AS TOTAL_COST " +
+                        "FROM COST_EXPLORER.PUBLIC.COSTS " +
+                        "GROUP BY MONTH, SERVICE " +
+                        "ORDER BY MONTH"
+        );
+    }
+
+    public List<Map<String, Object>> getDailyCost() {
+        return repository.fetchQuery(
+                "SELECT BILL_DATE, SUM(COST) AS TOTAL_COST " +
+                        "FROM COST_EXPLORER.PUBLIC.COSTS " +
+                        "GROUP BY BILL_DATE " +
+                        "ORDER BY BILL_DATE"
+        );
+    }
+
+    /* ---------------- FILTERED (TABLE VIEW) ---------------- */
+
+    public List<Map<String, Object>> getCostsWithFilters(Map<String, Object> filters) {
+        return repository.fetchWithFilters(
+                "COST_EXPLORER.PUBLIC.COSTS",
+                filters
+        );
     }
 }

@@ -1,4 +1,4 @@
-package com.example.cloudBalance.repository;
+package com.example.cloudBalance.repository.mysql;
 
 import com.example.cloudBalance.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

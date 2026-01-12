@@ -1,21 +1,17 @@
 package com.example.cloudBalance.config;
 
-import com.zaxxer.hikari.HikariDataSource;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.snowflake.snowpark_java.Session;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
-
-import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class SnowflakeConfig {
 
     @Value("${snowflake.url}")
-    private String jdbcUrl;
+    private String url;
 
     @Value("${snowflake.username}")
     private String username;
@@ -23,22 +19,27 @@ public class SnowflakeConfig {
     @Value("${snowflake.password}")
     private String password;
 
-    @Value("${snowflake.driver-class-name}")
-    private String driverClassName;
+    @Value("${snowflake.role}")
+    private String role;
+
+    @Value("${snowflake.database}")
+    private String db;
+
+    @Value("${snowflake.schema}")
+    private String schema;
 
     @Bean
-    public DataSource snowflakeDataSource() {
-        HikariDataSource ds = new HikariDataSource();
-        ds.setJdbcUrl(jdbcUrl);
-        ds.setUsername(username);
-        ds.setPassword(password);
-        ds.setDriverClassName(driverClassName);
-        return ds;
-    }
+    public Session createSession (){
+        Map<String,String> properties = new HashMap<>();
+        properties.put("URL",url);
+        properties.put("USER",username);
+        properties.put("PASSWORD",password);
+        properties.put("ROLE",role);
+        properties.put("DB",db);
+        properties.put("SCHEMA",schema);
 
-    @Bean
-    public JdbcTemplate snowflakeJdbcTemplate(@Qualifier("snowflakeDataSource") DataSource ds) {
-        return new JdbcTemplate(ds);
+        return Session.builder().configs(properties).create();
+
     }
 }
 
