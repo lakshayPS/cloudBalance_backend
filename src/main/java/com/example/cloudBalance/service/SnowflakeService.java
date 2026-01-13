@@ -118,28 +118,6 @@ public class SnowflakeService {
         );
     }
 
-//    public List<Map<String, Object>> getMonthlyCostByField(String field) {
-//        if (field == null || field.isEmpty()) field = "SERVICE";
-//
-//        List<String> validFields = List.of(
-//                "SERVICE", "INSTANCE_TYPE", "ACCOUNT_ID", "USAGE_TYPE", "PLATFORM", "REGION", "USAGE_TYPE_GROUP",
-//                "PURCHASE_OPTION", "API_OPERATION", "RESOURCE", "AVAILABILITY_ZONE", "TENANCY", "LEGAL_ENTITY", "BILLING_ENTITY"
-//        );
-//
-//        if (!validFields.contains(field.toUpperCase())) {
-//            field = "SERVICE"; // default
-//        }
-//
-//        String query = String.format(
-//                "SELECT TO_CHAR(BILL_DATE,'YYYY-MM') AS MONTH, %s AS GROUP_FIELD, SUM(COST) AS TOTAL_COST " +
-//                        "FROM COST_EXPLORER.PUBLIC.COSTS " +
-//                        "GROUP BY MONTH, %s ORDER BY MONTH",
-//                field, field
-//        );
-//
-//        return repository.fetchQuery(query);
-//    }
-
     public List<Map<String, Object>> getMonthlyCostByField(
             String field,
             int fromYear,

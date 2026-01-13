@@ -45,22 +45,18 @@ public class SnowflakeController {
         return snowflakeService.getCostPerAccount();
     }
 
-//    @GetMapping("/charts/monthly-cost-by-group")
-//    public List<Map<String, Object>> getMonthlyCostByGroup(@RequestParam(defaultValue = "SERVICE") String groupBy) {
-//        return snowflakeService.getMonthlyCostByField(groupBy);
-//    }
-@GetMapping("/monthly-cost-by-group")
-public List<Map<String, Object>> getMonthlyCost(
+    @GetMapping("/monthly-cost-by-group")
+    public List<Map<String, Object>> getMonthlyCost(
         @RequestParam String groupBy,
         @RequestParam int fromYear,
         @RequestParam int fromMonth,
         @RequestParam int toYear,
         @RequestParam int toMonth
-) {
-    return snowflakeService.getMonthlyCostByField(
+    ) {
+        return snowflakeService.getMonthlyCostByField(
             groupBy, fromYear, fromMonth, toYear, toMonth
-    );
-}
+        );
+    }
 
 
     /* ---------------- TIME SERIES ---------------- */
