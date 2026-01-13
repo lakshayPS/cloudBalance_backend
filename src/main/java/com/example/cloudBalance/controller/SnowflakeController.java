@@ -48,16 +48,18 @@ public class SnowflakeController {
 
     @GetMapping("/monthly-cost-by-group")
     public List<Map<String, Object>> getMonthlyCost(
-        @RequestParam String groupBy,
-        @RequestParam int fromYear,
-        @RequestParam int fromMonth,
-        @RequestParam int toYear,
-        @RequestParam int toMonth
+            @RequestParam Long accountId,   // 🔥 NEW
+            @RequestParam String groupBy,
+            @RequestParam int fromYear,
+            @RequestParam int fromMonth,
+            @RequestParam int toYear,
+            @RequestParam int toMonth
     ) {
         return snowflakeService.getMonthlyCostByField(
-            groupBy, fromYear, fromMonth, toYear, toMonth
+                accountId, groupBy, fromYear, fromMonth, toYear, toMonth
         );
     }
+
 
 
     /* ---------------- TIME SERIES ---------------- */

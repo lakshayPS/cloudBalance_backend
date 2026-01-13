@@ -4,10 +4,7 @@ import com.example.cloudBalance.repository.snowflake.SnowflakeRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class SnowflakeService {
@@ -121,6 +118,7 @@ public class SnowflakeService {
     }
 
     public List<Map<String, Object>> getMonthlyCostByField(
+            Long accountId,
             String field,
             int fromYear,
             int fromMonth,
@@ -128,19 +126,26 @@ public class SnowflakeService {
             int toMonth
     ) {
 
-        if (field == null || field.isEmpty()) field = "SERVICE";
+        if (accountId == null) {
+            throw new IllegalArgumentException("AccountId is required");
+        }
 
-        List<String> validFields = List.of(
-                "SERVICE", "INSTANCE_TYPE", "ACCOUNT_ID", "USAGE_TYPE", "PLATFORM",
-                "REGION", "USAGE_TYPE_GROUP", "PURCHASE_OPTION", "API_OPERATION",
-                "RESOURCE", "AVAILABILITY_ZONE", "TENANCY", "LEGAL_ENTITY", "BILLING_ENTITY"
-        );
-
-        if (!validFields.contains(field.toUpperCase())) {
+        if (field == null || field.isEmpty()) {
             field = "SERVICE";
         }
 
-        // 📅 Build date range
+        List<String> validFields = List.of(
+                "SERVICE", "INSTANCE_TYPE", "USAGE_TYPE", "PLATFORM",
+                "REGION", "USAGE_TYPE_GROUP", "PURCHASE_OPTION", "API_OPERATION",
+                "RESOURCE", "AVAILABILITY_ZONE", "TENANCY",
+                "LEGAL_ENTITY", "BILLING_ENTITY"
+        );
+
+        field = field.toUpperCase();
+        if (!validFields.contains(field)) {
+            field = "SERVICE";
+        }
+
         String fromDate = String.format("%04d-%02d-01", fromYear, fromMonth);
         String toDate = String.format(
                 "%04d-%02d-%02d",
@@ -156,15 +161,22 @@ public class SnowflakeService {
                     %s AS GROUP_FIELD,
                     SUM(COST) AS TOTAL_COST
                 FROM COST_EXPLORER.PUBLIC.COSTS
-                WHERE BILL_DATE BETWEEN '%s' AND '%s'
+                WHERE ACCOUNT_ID = %d
+                  AND BILL_DATE BETWEEN '%s' AND '%s'
                 GROUP BY MONTH, %s
                 ORDER BY MONTH
                 """,
-                field, fromDate, toDate, field
+                field,
+                accountId,
+                fromDate,
+                toDate,
+                field
         );
 
         return repository.fetchQuery(query);
     }
+
+
 
 
     public List<Map<String, Object>> getCostsWithFilters(Map<String, Object> filters) {
@@ -192,12 +204,10 @@ public class SnowflakeService {
             "BILLING_ENTITY"
     };
 
-    /** Fetch distinct values for all filters */
     public Map<String, List<String>> getAllFilterOptions() {
         Map<String, List<String>> options = new LinkedHashMap<>();
 
         for (String filter : FILTERS) {
-            // Snowflake column names are case-sensitive
             String sql = String.format("SELECT DISTINCT \"%s\" FROM %s ORDER BY \"%s\"", filter, "COSTS", filter);
             List<Map<String, Object>> rows = repository.fetchQuery(sql);
 
