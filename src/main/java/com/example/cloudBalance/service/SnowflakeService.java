@@ -4,6 +4,8 @@ import com.example.cloudBalance.repository.snowflake.SnowflakeRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -170,5 +172,44 @@ public class SnowflakeService {
                 "COST_EXPLORER.PUBLIC.COSTS",
                 filters
         );
+    }
+
+
+    private static final String[] FILTERS = {
+            "SERVICE",
+            "INSTANCE_TYPE",
+            "ACCOUNT_ID",
+            "USAGE_TYPE",
+            "PLATFORM",
+            "REGION",
+            "USAGE_TYPE_GROUP",
+            "PURCHASE_OPTION",
+            "API_OPERATION",
+            "RESOURCE",
+            "AVAILABILITY_ZONE",
+            "TENANCY",
+            "LEGAL_ENTITY",
+            "BILLING_ENTITY"
+    };
+
+    /** Fetch distinct values for all filters */
+    public Map<String, List<String>> getAllFilterOptions() {
+        Map<String, List<String>> options = new LinkedHashMap<>();
+
+        for (String filter : FILTERS) {
+            // Snowflake column names are case-sensitive
+            String sql = String.format("SELECT DISTINCT \"%s\" FROM %s ORDER BY \"%s\"", filter, "COSTS", filter);
+            List<Map<String, Object>> rows = repository.fetchQuery(sql);
+
+            List<String> values = new ArrayList<>();
+            for (Map<String, Object> row : rows) {
+                Object val = row.get(filter);
+                if (val != null) values.add(val.toString());
+            }
+
+            options.put(filter, values);
+        }
+
+        return options;
     }
 }

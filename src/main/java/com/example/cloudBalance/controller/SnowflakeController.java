@@ -1,5 +1,6 @@
 package com.example.cloudBalance.controller;
 
+import com.example.cloudBalance.dto.FilterResponse;
 import com.example.cloudBalance.service.SnowflakeService;
 import org.springframework.web.bind.annotation.*;
 
@@ -102,5 +103,11 @@ public class SnowflakeController {
         }
 
         return snowflakeService.getCostsWithFilters(filters);
+    }
+
+
+    @GetMapping("/get-filters")
+    public FilterResponse getFilters() {
+        return new FilterResponse(snowflakeService.getAllFilterOptions());
     }
 }
