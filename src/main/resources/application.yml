@@ -16,7 +16,7 @@ spring:
 
 jwt:
   secret: MySuperSecretKeyThatIsAtLeast256BitsLong1234567890
-  expiration: 300000
+  expiration: 600000
 
 snowflake:
   url : https://wcqguxc-ji40561.snowflakecomputing.com
