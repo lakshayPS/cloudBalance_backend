@@ -7,10 +7,12 @@ import com.example.cloudBalance.entity.OnboardedAccounts;
 import com.example.cloudBalance.entity.User;
 import com.example.cloudBalance.enums.AccountStatus;
 import com.example.cloudBalance.enums.Role;
+import com.example.cloudBalance.exception.EmailAlreadyInUseException;
 import com.example.cloudBalance.exception.ResourceNotFoundException;
+import com.example.cloudBalance.exception.UserAlreadyExistsException;
 import com.example.cloudBalance.repository.mysql.OnboardedAccountRepository;
 import com.example.cloudBalance.repository.mysql.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,23 +21,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private OnboardedAccountRepository accountRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final OnboardedAccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponse registerAndAssignAccounts(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("User already exists");
+            throw new UserAlreadyExistsException("User already exists");
         }
 
         User user = new User();
@@ -77,7 +75,7 @@ public class UserService {
 
         if (!user.getEmail().equals(request.getEmail())
                 && userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already in use");
+            throw new EmailAlreadyInUseException("Email already in use");
         }
 
         user.setEmail(request.getEmail());

@@ -3,7 +3,6 @@ package com.example.cloudBalance.dto;
 import com.example.cloudBalance.enums.Role;
 import jakarta.validation.constraints.*;
 import lombok.Data;
-
 import java.util.List;
 
 @Data

@@ -1,11 +1,13 @@
 package com.example.cloudBalance.filters;
 
+import com.example.cloudBalance.dto.ErrorResponse;
 import com.example.cloudBalance.utility.JwtUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,15 +17,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.Instant;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -34,43 +35,66 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        String token = null;
-        String username = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
 
-        try {
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                token = authHeader.substring(7);
-                username = jwtUtil.extractUsername(token);
-            }
-//            System.out.println("inside try!!!!!!!!!!!");
-        } catch (Exception e) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+            try {
+                String username = jwtUtil.extractUsername(token);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    UserDetails userDetails =
+                            userDetailsService.loadUserByUsername(username);
 
-            if (jwtUtil.validateToken(token, userDetails)) {
+                    if (jwtUtil.validateToken(token, userDetails)) {
 
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails,
+                                        null,
+                                        userDetails.getAuthorities()
+                                );
+
+                        authToken.setDetails(
+                                new WebAuthenticationDetailsSource()
+                                        .buildDetails(request)
                         );
 
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext()
+                                .setAuthentication(authToken);
+                    }
+                }
 
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            } catch (io.jsonwebtoken.ExpiredJwtException ex) {
+                sendUnauthorized(response, request, "JWT token has expired");
+                return;
+            } catch (Exception ex) {
+                sendUnauthorized(response, request, "Invalid JWT token");
+                return;
             }
         }
 
         filterChain.doFilter(request, response);
-//        System.out.println("after filter");
     }
+    private void sendUnauthorized(
+            HttpServletResponse response,
+            HttpServletRequest request,
+            String message
+    ) throws IOException {
 
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+
+        ErrorResponse error = new ErrorResponse(
+                401,
+                "Unauthorized",
+                message,
+                request.getRequestURI(),
+                Instant.now()
+        );
+
+        new ObjectMapper().writeValue(response.getOutputStream(), error);
+    }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {

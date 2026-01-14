@@ -3,7 +3,6 @@ package com.example.cloudBalance.dto;
 import com.example.cloudBalance.enums.AccountStatus;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.List;
 
 @Getter

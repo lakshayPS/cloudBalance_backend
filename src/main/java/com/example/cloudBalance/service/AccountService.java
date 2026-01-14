@@ -6,7 +6,7 @@ import com.example.cloudBalance.entity.OnboardedAccounts;
 import com.example.cloudBalance.entity.User;
 import com.example.cloudBalance.enums.AccountStatus;
 import com.example.cloudBalance.exception.ResourceAlreadyExistsException;
-import com.example.cloudBalance.exception.ResourceNotFoundException;
+import com.example.cloudBalance.exception.UserNotFoundException;
 import com.example.cloudBalance.repository.mysql.OnboardedAccountRepository;
 import com.example.cloudBalance.repository.mysql.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -77,36 +77,10 @@ public class AccountService {
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public void assignAccountToUser(Long userId, List<Long> accIds) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        List<OnboardedAccounts> accounts = accountRepository.findAllById(accIds);
-
-        if (accounts.size() != accIds.size()) {
-            throw new ResourceNotFoundException("Some accounts not found");
-        }
-
-        for (OnboardedAccounts account : accounts) {
-
-            if (!account.getAssignedToAccounts().contains(user)) {
-                account.getAssignedToAccounts().add(user);
-            }
-
-            account.setAccStatus(AccountStatus.ASSIGNED);
-        }
-
-        accountRepository.saveAll(accounts);
-    }
-
-
-    @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
     public List<OnboardedAcResponse> getAccountsByUserId(Long userId) {
 
         if(!userRepository.existsById(userId)) {
-            throw new IllegalArgumentException("User not found with this id: " + userId);
+            throw new UserNotFoundException("User not found with id: " + userId);
         }
 
         List<OnboardedAccounts> accounts = accountRepository.findByAssignedToAccounts_Id(userId);
@@ -122,9 +96,7 @@ public class AccountService {
                 accountRepository.findByAssignedToAccounts_Email(email);
 
         if (accounts.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "No accounts assigned to user with email: " + email
-            );
+            throw new UserNotFoundException("No accounts assigned to this user");
         }
 
         return accounts.stream()

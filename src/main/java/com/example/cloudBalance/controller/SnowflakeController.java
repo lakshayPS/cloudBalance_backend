@@ -2,20 +2,18 @@ package com.example.cloudBalance.controller;
 
 import com.example.cloudBalance.dto.FilterResponse;
 import com.example.cloudBalance.service.SnowflakeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/snowflake")
 public class SnowflakeController {
 
     private final SnowflakeService snowflakeService;
-
-    public SnowflakeController(SnowflakeService snowflakeService) {
-        this.snowflakeService = snowflakeService;
-    }
 
     @GetMapping("/monthly-cost-by-group")
     public List<Map<String, Object>> getMonthlyCost(

@@ -3,19 +3,15 @@ package com.example.cloudBalance.repository.snowflake;
 import com.snowflake.snowpark_java.DataFrame;
 import com.snowflake.snowpark_java.Row;
 import com.snowflake.snowpark_java.Session;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.*;
 import java.util.*;
 
 @Repository
+@RequiredArgsConstructor
 public class SnowflakeRepository {
 
     private final Session snowflakeSession;
-
-    public SnowflakeRepository(Session snowflakeSession) {
-        this.snowflakeSession = snowflakeSession;
-    }
 
     public List<Map<String, Object>> fetchQuery(String sql) {
         DataFrame df = snowflakeSession.sql(sql);

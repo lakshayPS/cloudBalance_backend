@@ -3,29 +3,25 @@ package com.example.cloudBalance.controller;
 import com.example.cloudBalance.dto.RegisterRequest;
 import com.example.cloudBalance.dto.UpdateUserRequest;
 import com.example.cloudBalance.dto.UserResponse;
-import com.example.cloudBalance.entity.User;
 import com.example.cloudBalance.service.AuthService;
 import com.example.cloudBalance.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
+@RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
-    @Autowired
-    private AuthService authService;
-
-    @Autowired
-    private UserService userService;
+    private final AuthService authService;
+    private final UserService userService;
 
     @GetMapping("/getAllUsers")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
