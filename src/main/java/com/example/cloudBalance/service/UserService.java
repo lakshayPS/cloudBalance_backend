@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,6 +28,28 @@ public class UserService {
     private final UserRepository userRepository;
     private final OnboardedAccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'READONLY')")
+    public List<UserResponse> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return mapToUserResponseDto(users);
+    }
+
+    private List<UserResponse> mapToUserResponseDto(List<User> users) {
+        List<UserResponse> result = new ArrayList<>();
+
+        for(User user: users) {
+            UserResponse userResponse = new UserResponse();
+            userResponse.setId(user.getId());
+            userResponse.setFirstName(user.getFirstName());
+            userResponse.setLastName(user.getLastName());
+            userResponse.setEmail(user.getEmail());
+            userResponse.setRole(user.getRole());
+
+            result.add(userResponse);
+        }
+        return result;
+    }
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")

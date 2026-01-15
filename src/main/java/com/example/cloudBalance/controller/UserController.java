@@ -25,7 +25,7 @@ public class UserController {
 
     @GetMapping("/getAllUsers")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
-        return ResponseEntity.ok(authService.getAllUsers());
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @PostMapping("/addUser")

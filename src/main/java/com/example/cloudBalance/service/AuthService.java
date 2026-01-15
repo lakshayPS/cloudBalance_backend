@@ -49,26 +49,4 @@ public class AuthService {
 
         return new JwtResponse("Bearer", token, userName, email, role);
     }
-
-    @PreAuthorize("hasAnyRole('ADMIN', 'READONLY')")
-    public List<UserResponse> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return mapToUserResponseDto(users);
-    }
-
-    private List<UserResponse> mapToUserResponseDto(List<User> users) {
-        List<UserResponse> result = new ArrayList<>();
-
-        for(User user: users) {
-            UserResponse userResponse = new UserResponse();
-            userResponse.setId(user.getId());
-            userResponse.setFirstName(user.getFirstName());
-            userResponse.setLastName(user.getLastName());
-            userResponse.setEmail(user.getEmail());
-            userResponse.setRole(user.getRole());
-
-            result.add(userResponse);
-        }
-        return result;
-    }
 }
